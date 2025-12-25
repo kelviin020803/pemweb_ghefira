@@ -49,16 +49,14 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'user', // Default role is user
         ]);
 
-        Auth::login($user);
-
-        return redirect()->route('user.dashboard');
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
     /**
