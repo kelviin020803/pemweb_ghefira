@@ -66,12 +66,18 @@ php artisan db:seed
 php artisan jwt:secret
 ```
 
-### 9. Build Assets Frontend
+### 9. Buat Storage Link (PENTING untuk gambar)
+```bash
+php artisan storage:link
+```
+Ini akan membuat symbolic link dari `public/storage` ke `storage/app/public` agar gambar produk bisa diakses dari browser.
+
+### 10. Build Assets Frontend
 ```bash
 npm run build
 ```
 
-### 10. Jalankan Aplikasi
+### 11. Jalankan Aplikasi
 ```bash
 php artisan serve
 ```
@@ -114,6 +120,13 @@ Build assets terlebih dahulu:
 ```bash
 npm run build
 ```
+
+### Error: Gambar produk tidak muncul (broken image)
+Jalankan perintah untuk membuat storage link:
+```bash
+php artisan storage:link
+```
+Jika ada error "symlink(): Could not fetch file information", jalankan Command Prompt/PowerShell sebagai **Administrator** lalu jalankan ulang perintah di atas.
 
 ## Struktur Proyek
 
