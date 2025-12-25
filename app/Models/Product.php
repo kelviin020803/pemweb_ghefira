@@ -50,4 +50,12 @@ class Product extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * Use slug for route model binding
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

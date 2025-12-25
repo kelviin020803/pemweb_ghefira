@@ -65,19 +65,19 @@ Route::get('/products', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
-    // Dashboard
+    // User Dashboard / Profile
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
-    // Orders
+    // Orders (using UUID in URL)
     Route::get('/orders', [UserController::class, 'orders'])->name('orders');
-    Route::get('/orders/{order}', [UserController::class, 'showOrder'])->name('orders.show');
-    Route::patch('/orders/{order}/cancel', [UserController::class, 'cancelOrder'])->name('orders.cancel');
-    Route::get('/orders/{order}/whatsapp', [UserController::class, 'redirectToWhatsApp'])->name('orders.whatsapp');
+    Route::get('/orders/{order:uuid}', [UserController::class, 'showOrder'])->name('orders.show');
+    Route::patch('/orders/{order:uuid}/cancel', [UserController::class, 'cancelOrder'])->name('orders.cancel');
+    Route::get('/orders/{order:uuid}/whatsapp', [UserController::class, 'redirectToWhatsApp'])->name('orders.whatsapp');
 
-    // Checkout
-    Route::get('/checkout/{product}', [UserController::class, 'checkout'])->name('checkout');
-    Route::post('/checkout/{product}', [UserController::class, 'placeOrder'])->name('checkout.post');
-    Route::get('/order-success/{order}', [UserController::class, 'orderSuccess'])->name('order.success');
+    // Checkout (using slug in URL)
+    Route::get('/checkout/{product:slug}', [UserController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout/{product:slug}', [UserController::class, 'placeOrder'])->name('checkout.post');
+    Route::get('/order-success/{order:uuid}', [UserController::class, 'orderSuccess'])->name('order.success');
 });
 
 /*
@@ -89,21 +89,21 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Orders Management
+    // Orders Management (using UUID in URL)
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
-    Route::get('/orders/{order}', [AdminController::class, 'showOrder'])->name('orders.show');
-    Route::patch('/orders/{order}/confirm', [AdminController::class, 'confirmOrder'])->name('orders.confirm');
-    Route::patch('/orders/{order}/complete', [AdminController::class, 'completeOrder'])->name('orders.complete');
-    Route::patch('/orders/{order}/cancel', [AdminController::class, 'cancelOrder'])->name('orders.cancel');
+    Route::get('/orders/{order:uuid}', [AdminController::class, 'showOrder'])->name('orders.show');
+    Route::patch('/orders/{order:uuid}/confirm', [AdminController::class, 'confirmOrder'])->name('orders.confirm');
+    Route::patch('/orders/{order:uuid}/complete', [AdminController::class, 'completeOrder'])->name('orders.complete');
+    Route::patch('/orders/{order:uuid}/cancel', [AdminController::class, 'cancelOrder'])->name('orders.cancel');
 
-    // Products Management
+    // Products Management (using slug in URL)
     Route::get('/products', [AdminController::class, 'products'])->name('products');
     Route::get('/products/create', [AdminController::class, 'createProduct'])->name('products.create');
     Route::post('/products', [AdminController::class, 'storeProduct'])->name('products.store');
-    Route::get('/products/{product}/edit', [AdminController::class, 'editProduct'])->name('products.edit');
-    Route::put('/products/{product}', [AdminController::class, 'updateProduct'])->name('products.update');
-    Route::delete('/products/{product}', [AdminController::class, 'deleteProduct'])->name('products.delete');
-    Route::patch('/products/{product}/stock', [AdminController::class, 'updateStock'])->name('products.stock');
+    Route::get('/products/{product:slug}/edit', [AdminController::class, 'editProduct'])->name('products.edit');
+    Route::put('/products/{product:slug}', [AdminController::class, 'updateProduct'])->name('products.update');
+    Route::delete('/products/{product:slug}', [AdminController::class, 'deleteProduct'])->name('products.delete');
+    Route::patch('/products/{product:slug}/stock', [AdminController::class, 'updateStock'])->name('products.stock');
 
     // Users Management
     Route::get('/users', [AdminController::class, 'users'])->name('users');

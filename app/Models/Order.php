@@ -82,4 +82,12 @@ class Order extends Model
     {
         return $this->status === 'cancelled';
     }
+
+    /**
+     * Use UUID for route model binding
+     */
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
 }
