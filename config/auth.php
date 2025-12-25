@@ -9,8 +9,8 @@ return [
     */
 
     'defaults' => [
-        //  MODUL 6: default guard API (JWT)
-        'guard' => 'api',
+        // Default guard untuk web session
+        'guard' => 'web',
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 

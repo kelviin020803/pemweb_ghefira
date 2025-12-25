@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('slug')->unique();    // Slug untuk URL (judul-produk)
             $table->string('brand');             // Nama brand fashion
             $table->string('name');              // Nama produk
             $table->string('category');          // Kategori fashion (Shoes, Hoodie, Bag, dll)
-            $table->integer('price');            // Harga
+            $table->decimal('price', 10, 2);     // Harga dengan 2 desimal
+            $table->integer('stock')->default(0); // Stok produk
             $table->text('description')->nullable();  // Deskripsi produk
-            $table->string('image_url')->nullable();  // Link gambar produk
+            $table->string('image_path')->nullable(); // Path gambar produk di storage
             $table->timestamps();                // created_at & updated_at
         });
     }

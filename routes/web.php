@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
+use App\Models\Product;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +22,31 @@ Route::get('/', function () {
 | AUTH
 |--------------------------------------------------------------------------
 */
-Route::view('/login', 'auth.login')->name('login');
-Route::view('/register', 'auth.register')->name('register');
+Route::get('/login', function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        if ($user && $user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('user.dashboard');
+    }
+    return view('auth.login');
+})->name('login');
+
+Route::get('/register', function () {
+    if (auth()->check()) {
+        return redirect()->route('user.dashboard');
+    }
+    return view('auth.register');
+})->name('register');
+
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| USER FLOW
+| PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
 
@@ -31,14 +54,64 @@ Route::view('/register', 'auth.register')->name('register');
 Route::view('/home', 'home')->name('home');
 
 // LIST PRODUCT (by category via query param)
-Route::view('/products', 'products')->name('products');
-
-// CHECKOUT
-Route::view('/checkout', 'checkout')->name('checkout');
+Route::get('/products', function () {
+    $products = Product::where('stock', '>', 0)->get();
+    return view('products', compact('products'));
+})->name('products');
 
 /*
 |--------------------------------------------------------------------------
-| FALLBACK (OPTIONAL, BIAR GA 404 ANEH)
+| USER ROUTES (authenticated users)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+
+    // Orders
+    Route::get('/orders', [UserController::class, 'orders'])->name('orders');
+    Route::get('/orders/{order}', [UserController::class, 'showOrder'])->name('orders.show');
+    Route::patch('/orders/{order}/cancel', [UserController::class, 'cancelOrder'])->name('orders.cancel');
+    Route::get('/orders/{order}/whatsapp', [UserController::class, 'redirectToWhatsApp'])->name('orders.whatsapp');
+
+    // Checkout
+    Route::get('/checkout/{product}', [UserController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout/{product}', [UserController::class, 'placeOrder'])->name('checkout.post');
+    Route::get('/order-success/{order}', [UserController::class, 'orderSuccess'])->name('order.success');
+});
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // Orders Management
+    Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+    Route::get('/orders/{order}', [AdminController::class, 'showOrder'])->name('orders.show');
+    Route::patch('/orders/{order}/confirm', [AdminController::class, 'confirmOrder'])->name('orders.confirm');
+    Route::patch('/orders/{order}/complete', [AdminController::class, 'completeOrder'])->name('orders.complete');
+    Route::patch('/orders/{order}/cancel', [AdminController::class, 'cancelOrder'])->name('orders.cancel');
+
+    // Products Management
+    Route::get('/products', [AdminController::class, 'products'])->name('products');
+    Route::get('/products/create', [AdminController::class, 'createProduct'])->name('products.create');
+    Route::post('/products', [AdminController::class, 'storeProduct'])->name('products.store');
+    Route::get('/products/{product}/edit', [AdminController::class, 'editProduct'])->name('products.edit');
+    Route::put('/products/{product}', [AdminController::class, 'updateProduct'])->name('products.update');
+    Route::delete('/products/{product}', [AdminController::class, 'deleteProduct'])->name('products.delete');
+    Route::patch('/products/{product}/stock', [AdminController::class, 'updateStock'])->name('products.stock');
+
+    // Users Management
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+});
+
+/*
+|--------------------------------------------------------------------------
+| FALLBACK
 |--------------------------------------------------------------------------
 */
 Route::fallback(function () {
